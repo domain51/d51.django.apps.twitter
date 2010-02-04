@@ -1,0 +1,9 @@
+*.pyc
+include/*
+lib/*
+bin/activate*
+bin/easy_install*
+bin/python
+bin/pip
+bin/django-admin.py
+src/*
