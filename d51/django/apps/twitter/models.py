@@ -15,12 +15,12 @@ def get_twitter(settings = None):
     return t
 
 class TwitterUser(models.Model):
-    id = models.CharField(max_length=200, primary_key=True)
-    name = models.CharField(max_length=200, null=True)
-    screen_name = models.CharField(max_length=100)
-    location = models.CharField(max_length=100, null=True)
-    description = models.CharField(max_length=140, null=True)
-    url = models.URLField(max_length=250, null=True)
+    id = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=255, null=True)
+    screen_name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255, null=True)
+    description = models.CharField(max_length=255, null=True)
+    url = models.URLField(max_length=255, null=True)
     friends_count = models.IntegerField(default=0)
     statuses_count = models.IntegerField(default=0)
     followers_count = models.IntegerField(default=0)
@@ -68,12 +68,14 @@ class TwitterUser(models.Model):
         # TODO: gracefully handle case where self.id nor self.screen_name are
         #       present.
 
-        del values["status"]
+        if "status" in values:
+            del values["status"]
         # TODO: add this back in once twitterro has them as proper date objects
-        del values["created_at"]
+        if "created_at" in values:
+            del values["created_at"]
 
         for k,v in values.iteritems():
-            self.__dict__[k] = v
+            self.__dict__[k] = k == "id" and str(v) or v
 
     def __unicode__(self):
         return "%s [%s]" % (self.screen_name, self.id)
