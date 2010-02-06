@@ -20,7 +20,7 @@ for dirpath, dirnames, filenames in os.walk('d51'):
 
 setup(
     name='d51.django.apps.twitter',
-    version='0.1', # TODO: move this into Dolt.get_version()
+    version='0.1',
     description='Simple app for mimicking some of Twitter\'s data models.',
     author='Domain51',
     author_email='official@domain51.com',
