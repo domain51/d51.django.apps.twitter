@@ -39,3 +39,12 @@ class TestOfGetTwitterFunction(TestCase):
         twitter = utils.get_twitter()
         self.assertEqual("foobar", twitter._http.consumer.key)
         self.assertEqual("barfoo", twitter._http.consumer.secret)
+
+    def test_does_not_have_token_by_default(self):
+        twitter = utils.get_twitter()
+        self.assertEqual(None, twitter._http.token)
+
+    def test_uses_provided_token_if_supplied(self):
+        token = oauth2.Token('foobar', 'barfoo')
+        twitter = utils.get_twitter(token=token)
+        self.assertEqual(token, twitter._http.token)

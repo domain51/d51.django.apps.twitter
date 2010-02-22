@@ -15,6 +15,6 @@ def get_http_client(consumer=None, token=None, settings=django_settings):
     consumer = consumer if consumer else get_configured_consumer(settings=settings)
     return oauth2.Client(consumer, token)
 
-def get_twitter(settings=django_settings):
-    http = get_http_client(settings=settings)
+def get_twitter(settings=django_settings, token=None):
+    http = get_http_client(settings=settings, token=token)
     return Twitter(http=http)
