@@ -1,6 +1,7 @@
 from celery.decorators import task
 from celery.task import Task
 from d51.django.apps.twitter.models import TwitterUser, get_twitter
+from celery.conf import DEFAULT_ROUTING_KEY 
 
 @task
 def sync_user(twitter_id, source=None, crawl_mode=False):
@@ -22,7 +23,7 @@ def sync_user(twitter_id, source=None, crawl_mode=False):
     return user
 
 @task
-def crawl(id=None, screen_name=None, cursor=-1, crawl_mode=False):
+def crawl(id=None, screen_name=None, cursor=-1, crawl_mode=False, routing_key=DEFAULT_ROUTING_KEY):
     logger = Task.get_logger()
     logger.info('[crawl] starting crawl(id=%s, screen_name=%s, cursor=%s)' % (id, screen_name, cursor))
     twitter = get_twitter()
@@ -41,11 +42,19 @@ def crawl(id=None, screen_name=None, cursor=-1, crawl_mode=False):
     source = sync_user(source_id)
 
     for id in result['ids']:
-        sync_user.delay(id, source=source, crawl_mode=crawl_mode)
+        sync_user.apply_async(args=[id,], kwargs={'source':source, 'crawl_mode':crawl_mode}, routing_key=routing_key)
 
     if result['next_cursor']:
         logger.info("[crawl] continuing at next_cursor=%s" % result['next_cursor'])
-        crawl.delay(twitter_id, cursor=result['next_cursor'], crawl_mode=crawl_mode)
+        crawl.apply_async(
+            args=[twitter_id,],
+            kwargs={
+                'cursor':result['next_cursor'], 
+                'crawl_mode':crawl_mode, 
+                'routing_key':routing_key,
+            }, 
+            routing_key=routing_key
+        )
 
 
 
